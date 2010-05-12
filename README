@@ -32,7 +32,7 @@ Helper Methods
 Installation
 ------------
 
-Via Rubygems:
+Via RubyGems:
 
     $ sudo gem install sinatra-session
 

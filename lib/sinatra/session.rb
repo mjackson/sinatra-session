@@ -1,11 +1,14 @@
 require 'sinatra/base'
 
 module Sinatra
+  # Simple, secure sessions for Sinatra.
+  #
+  # http://mjijackson.com/sinatra-session
   module Session
 
     # Request-level helper methods for Sinatra routes.
     module Helpers
-      # After this method is called, calls to #sesson? will return +true+.
+      # After this method is called, calls to #session? will return +true+.
       def session_start!
         session['sinatra.session'] = true
       end
@@ -21,7 +24,7 @@ module Sinatra
         end
       end
 
-      # Returns +true+ if the current session is valid, false otherwise.
+      # Returns +true+ if the current session is valid, +false+ otherwise.
       def session?
         !! session['sinatra.session']
       end
@@ -33,8 +36,8 @@ module Sinatra
       end
     end
 
-    # A wrapper for Rack::Session::Cookie middleware that allows an options
-    # hash to be returned from the block given to the `use` statement instead
+    # A wrapper for the Rack::Session::Cookie middleware that allows an options
+    # hash to be returned from the block given to the +use+ statement instead
     # of being provided up front.
     module Cookie
       def self.new(app, options={})
