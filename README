@@ -2,7 +2,7 @@ Sinatra::Session
 ================
 
 Sinatra::Session is a small extension for Sinatra apps that provides several
-convenience settings and methods when working with cookie-based sessions.
+convenient settings and methods when working with cookie-based sessions.
 
 Settings
 --------
@@ -47,6 +47,9 @@ Usage
 
 As with all Sinatra extensions, Sinatra::Session may be used in both classic
 and modular-style apps. First, classic.
+
+    require 'sinatra'
+    require 'sinatra/session'
 
     set :session_fail, '/login'
     set :session_secret, 'So0perSeKr3t!'
