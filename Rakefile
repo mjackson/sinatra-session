@@ -2,7 +2,28 @@ require 'rake/clean'
 
 task :default => :package
 
-CLEAN.include %w< dist >
+# DOCS ########################################################################
+
+desc "Generate API documentation"
+task :api => FileList['lib/**/*.rb'] do |t|
+  output_dir = ENV['OUTPUT_DIR'] || 'api'
+  rm_rf output_dir
+  sh((<<-SH).gsub(/[\s\n]+/, ' ').strip)
+  hanna
+    --op #{output_dir}
+    --promiscuous
+    --charset utf8
+    --fmt html
+    --inline-source
+    --line-numbers
+    --accessor option_accessor=RW
+    --main Sinatra::Session
+    --title 'Sinatra::Session API Documentation'
+    #{t.prerequisites.join(' ')}
+  SH
+end
+
+CLEAN.include 'api'
 
 # PACKAGING & INSTALLATION ####################################################
 
@@ -37,3 +58,5 @@ if defined?(Gem)
     sh "gem push #{package('.gem')}"
   end
 end
+
+CLOBBER.include 'dist'
