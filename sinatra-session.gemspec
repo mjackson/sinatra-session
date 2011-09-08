@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.add_dependency('sinatra', '>= 1.0')
   s.add_development_dependency('rake')
 
-  s.has_rdoc = true
   s.rdoc_options = %w< --line-numbers --inline-source --title Sinatra::Session --main Sinatra::Session >
   s.extra_rdoc_files = %w< README >
 
