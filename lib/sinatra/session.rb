@@ -32,7 +32,7 @@ module Sinatra
       # Redirects the client to the URL given in the +session_fail+ setting
       # if #session? returns +false+.
       def session!
-        redirect(settings.session_fail) unless session?
+        redirect(settings.session_fail) unless session? || settings.session_fail == request.path_info
       end
     end
 
