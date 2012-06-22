@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sinatra::Session by mjijackson</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Sinatra::Session</h1>
+        <p>Simple, secure sessions for Sinatra</p>
+
+        <p class="view"><a href="https://github.com/mjijackson/sinatra-session">View the Project on GitHub <small>mjijackson/sinatra-session</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/mjijackson/sinatra-session/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mjijackson/sinatra-session/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mjijackson/sinatra-session">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><strong>Sinatra::Session</strong> is a small extension for <a href="http://www.sinatrarb.com/">Sinatra</a>
+apps that provides several convenient settings and methods when working with
+HTTP cookie-based sessions.</p>
+
+<h2>Settings</h2>
+
+<pre><code>`session_fail`   -&gt; A URL in your app that the client will be redirected to
+                    when `session!` is called and the session is not valid.
+                    Defaults to '/login'
+`session_name`   -&gt; The name to use for the session cookie
+`session_path`   -&gt; The session cookie path
+`session_domain` -&gt; The session cookie domain
+`session_expire` -&gt; The number of seconds from now the cookie will be valid
+`session_secret` -&gt; A secret key that is used to check the integrity of
+                    session data
+</code></pre>
+
+<h2>Helper Methods</h2>
+
+<pre><code>`session_start!`             -&gt; Starts the session
+`session_end!(destroy=true)` -&gt; Ends the session. If `destroy` is false then
+                                session data will be preserved, even though
+                                future calls to `session?` will return false
+`session?`                   -&gt; Returns true if the session is valid
+`session!`                   -&gt; Redirects the client to the URL specified in
+                                the `session_fail` option unless the session
+                                is valid
+</code></pre>
+
+<h2>Installation</h2>
+
+<p>Via <a href="http://rubygems.org">RubyGems</a>:</p>
+
+<pre><code>$ sudo gem install sinatra-session
+</code></pre>
+
+<p>From a local copy:</p>
+
+<pre><code>$ git clone git://github.com/mjijackson/sinatra-session.git
+$ cd sinatra-session
+$ rake package &amp;&amp; sudo rake install
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>As with all Sinatra extensions, <code>Sinatra::Session</code> may be used in both classic
+and modular-style apps. First, classic.</p>
+
+<div class="highlight">
+<pre><span class="nb">require</span> <span class="s1">'sinatra'</span>
+<span class="nb">require</span> <span class="s1">'sinatra/session'</span>
+
+<span class="n">set</span> <span class="ss">:session_fail</span><span class="p">,</span> <span class="s1">'/login'</span>
+<span class="n">set</span> <span class="ss">:session_secret</span><span class="p">,</span> <span class="s1">'So0perSeKr3t!'</span>
+
+<span class="n">get</span> <span class="s1">'/'</span> <span class="k">do</span>
+  <span class="n">session!</span>
+  <span class="s1">'Hello, '</span> <span class="o">+</span> <span class="n">session</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">+</span> <span class="s1">'! Click &lt;a href="/logout"&gt;here&lt;/a&gt; to logout.'</span>
+<span class="k">end</span>
+
+<span class="n">get</span> <span class="s1">'/login'</span> <span class="k">do</span>
+  <span class="k">if</span> <span class="n">session?</span>
+    <span class="n">redirect</span> <span class="s1">'/'</span>
+  <span class="k">else</span>
+    <span class="s1">'&lt;form method="POST" action="/login"&gt;'</span> <span class="o">+</span>
+    <span class="s1">'Please enter your name: &lt;input type="text" name="name"&gt;'</span> <span class="o">+</span>
+    <span class="s1">'&lt;input type="submit" value="Submit"&gt;'</span> <span class="o">+</span>
+    <span class="s1">'&lt;/form&gt;'</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">post</span> <span class="s1">'/login'</span> <span class="k">do</span>
+  <span class="k">if</span> <span class="n">params</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span>
+    <span class="n">session_start!</span>
+    <span class="n">session</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span>
+    <span class="n">redirect</span> <span class="s1">'/'</span>
+  <span class="k">else</span>
+    <span class="n">redirect</span> <span class="s1">'/login'</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">get</span> <span class="s1">'/logout'</span> <span class="k">do</span>
+  <span class="n">session_end!</span>
+  <span class="n">redirect</span> <span class="s1">'/'</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>Modular apps use very similar code but must also mixin <code>Sinatra::Session</code> via
+<code>Sinatra#register</code>, like so:</p>
+
+<div class="highlight">
+<pre><span class="nb">require</span> <span class="s1">'sinatra/base'</span>
+<span class="nb">require</span> <span class="s1">'sinatra/session'</span>
+
+<span class="k">class</span> <span class="nc">MyApp</span> <span class="o">&lt;</span> <span class="no">Sinatra</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">register</span> <span class="no">Sinatra</span><span class="o">::</span><span class="no">Session</span>
+
+  <span class="c1"># insert settings and routes here, same as in</span>
+  <span class="c1"># classic example above</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<h2>License</h2>
+
+<p>Copyright 2012 Michael Jackson</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>The software is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of merchantability,
+fitness for a particular purpose and non-infringement. In no event shall the
+authors or copyright holders be liable for any claim, damages or other
+liability, whether in an action of contract, tort or otherwise, arising from,
+out of or in connection with the software or the use or other dealings in
+the software.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mjijackson">mjijackson</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
