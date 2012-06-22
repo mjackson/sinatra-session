@@ -1,9 +1,6 @@
 require 'sinatra/base'
 
 module Sinatra
-  # Simple, secure sessions for Sinatra.
-  #
-  # http://mjijackson.com/sinatra-session
   module Session
 
     # Request-level helper methods for Sinatra routes.
