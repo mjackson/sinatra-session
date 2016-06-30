@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'encrypted_cookie'
 
 module Sinatra
   module Session
@@ -38,8 +39,20 @@ module Sinatra
     # of being provided up front.
     module Cookie
       def self.new(app, options={})
-        options.merge!(yield) if block_given?
-        Rack::Session::Cookie.new(app, options)
+        # If true, use EncryptedCookie. The :session_secret also needs to be a
+        # (random) string > 32 chars.
+        if (app.settings.session_encrypted && app.settings.session_secret.length >= 32)
+          Rack::Session::EncryptedCookie.new(app, {
+            :key => app.settings.session_name,
+            :path => app.settings.session_path,
+            :domain => app.settings.session_domain,
+            :expire_after => app.settings.session_expire,
+            :secret => app.settings.session_secret
+          })
+        else
+          options.merge!(yield) if block_given?
+          Rack::Session::Cookie.new(app, options)
+        end
       end
     end
 
@@ -49,6 +62,9 @@ module Sinatra
       # This should be set to the redirect URL the client will be sent to if
       # the session is not valid.
       app.set :session_fail, '/login'
+
+      # Set to true to use EncryptedCookie.
+      app.set :session_encrypted, false
 
       # Parameters for the session cookie.
       app.set :session_name, 'sinatra.session'
