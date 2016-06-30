@@ -13,6 +13,13 @@ HTTP cookie-based sessions.
     `session_expire` -> The number of seconds from now the cookie will be valid
     `session_secret` -> A secret key that is used to check the integrity of
                         session data
+    `session_encrypted` -> Set to `true` to use Rack::Session::EncryptedCookie.
+                          Note that `session_secret` must also be a (random)
+                          string > 32 chars. See below.
+
+***Rack::Session::EncryptedCookie** is implemented through the `encrypted_cookie` gem, which provides 256-bit-AES-encrypted, tamper-proof cookies for Rack. Your `:session_secret` must be at least 32 bytes long and should be really random. Don't use a password or passphrase, generate something random. E.g. run this in a terminal and paste the output into your script:
+
+    $ ruby -rsecurerandom -e "puts SecureRandom.hex(32)"
 
 ## Helper Methods
 
@@ -47,7 +54,8 @@ require 'sinatra'
 require 'sinatra/session'
 
 set :session_fail, '/login'
-set :session_secret, 'So0perSeKr3t!'
+set :session_secret, 'So0perSeKr3t!So0perSeKr3t!So0perSeKr3t!'
+set :session_encrypted, true
 
 get '/' do
   session!
